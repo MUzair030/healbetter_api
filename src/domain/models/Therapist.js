@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const PatientSchema = new mongoose.Schema({
+const TherapistSchema = new mongoose.Schema({
   googleId: { type: String, required: false },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -17,6 +17,6 @@ const PatientSchema = new mongoose.Schema({
   isDeleted: { type: Boolean, default: false },
 });
 
-const Patient = mongoose.model('Patient', PatientSchema);
+const Therapist = mongoose.model('Therapist', TherapistSchema);
 
-export default Patient;
+export default Therapist;

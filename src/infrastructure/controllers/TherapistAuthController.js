@@ -1,12 +1,12 @@
 import express from 'express';
 import passport from '../../application/services/GoogleAuthService.js';
-import PatientRepositoryImpl from '../repositories/PatientRepositoryImpl.js';
-import PatientAuthService from '../../application/services/PatientAuthService.js';
+import TherapistRepositoryImpl from '../repositories/TherapistRepositoryImpl.js';
 import CommonResponse from '../../application/common/CommonResponse.js';
+import TherapistAuthService from "../../application/services/TherapistAuthService.js";
 
 const router = express.Router();
-const patientRepository = new PatientRepositoryImpl();
-const authService = new PatientAuthService(patientRepository);
+const therapistRepository = new TherapistRepositoryImpl();
+const authService = new TherapistAuthService(therapistRepository);
 
 router.post('/signup', async (req, res) => {
   try {
@@ -73,8 +73,10 @@ router.get('/google/callback', (req, res, next) => {
       if (err) {
         console.error('Login error:', err);
         return CommonResponse.error(res, 'Login failed');
+        // return res.status(500).send('Login failed');
       }
       CommonResponse.success(res, null, "Login Successful!");
+      // return res.status(200).send("Login Successful!");
     });
   })(req, res, next);
 });

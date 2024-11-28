@@ -1,23 +1,46 @@
 import express from 'express';
 import passport from '../../application/services/GoogleAuthService.js';
-import PatientRepositoryImpl from '../repositories/PatientRepositoryImpl.js';
-import PatientAuthService from '../../application/services/PatientAuthService.js';
 import CommonResponse from '../../application/common/CommonResponse.js';
+import TherapistRepositoryImpl from "../repositories/TherapistRepositoryImpl.js";
+import TherapistAuthService from "../../application/services/TherapistAuthService.js";
+import TherapistManagementService from "../../application/services/TherapistManagementService.js";
 
 const router = express.Router();
-const userRepository = new PatientRepositoryImpl();
-const authService = new PatientAuthService(userRepository);
+const userRepository = new TherapistRepositoryImpl();
+const authService = new TherapistAuthService(userRepository);
+const therapistService = new TherapistManagementService();
 
 
+router.get('/', async (req, res) => {
+  try {
+    const result = await therapistService.getAllTherapists();
+    CommonResponse.success(res, result);
+  } catch (error) {
+    CommonResponse.error(res, error.message, 400);
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await therapistService.getTherapistById(id);
+    CommonResponse.success(res, result);
+  } catch (error) {
+    CommonResponse.error(res, error.message, 404);
+  }
+});
 
 router.get('/verify-email', async (req, res) => {
-  const { token } = req.query;
+  const { email, code } = req.query;
   try {
-    const result = await authService.verifyEmail(token);
+    if (!email || !code) {
+      return CommonResponse.error(res, 'Email and verification code are required', 400);
+    }
+
+    const result = await authService.verifyEmail(email, code);
     CommonResponse.success(res, result);
-    // res.status(200).json(result);
   } catch (error) {
-    CommonResponse.error(res, err.message, 400);
+    CommonResponse.error(res, error.message, 400);
   }
 });
 
@@ -51,7 +74,6 @@ router.get('/delete', passport.authenticate('jwt', { session: false }), async (r
     const userId = req.user.id;
     await authService.markAccountAsDeleted(userId);
     CommonResponse.success(res, null,  'Account deleted successfully');
-    // res.status(200).json({ message: 'Account deleted successfully' });
   } catch (error) {
     CommonResponse.error(res, err.message, 400);
   }

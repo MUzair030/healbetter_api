@@ -10,7 +10,7 @@ const userRepository = new PatientRepositoryImpl();
 passport.use(new GoogleStrategy({
   clientID: config.googleClientId,
   clientSecret: config.googleClientSecret,
-  callbackURL: '/api/auth/google/callback',
+  callbackURL: '/api/v1/auth/patient/google/callback',
 },
 async (accessToken, refreshToken, profile, done) => {
   try {

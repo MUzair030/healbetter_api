@@ -1,16 +1,16 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import moment from 'moment';
 import config from '../../config/config.js';
 import emailService from './EmailService.js';
+import moment from 'moment';
 
-class PatientAuthService {
-  constructor(patientRepository) {
-    this.patientRepository = patientRepository;
+class TherapistAuthService {
+  constructor(therapistRepository) {
+    this.therapistRepository = therapistRepository;
   }
 
   async signUp({ firstName, lastName, phone, email, password, dob, city, state, country }) {
-    const existingUser = await this.patientRepository.findByEmail(email);
+    const existingUser = await this.therapistRepository.findByEmail(email);
     const formattedDob = moment(dob, 'YYYY-MM-DD').toDate();
     if (!formattedDob || isNaN(formattedDob)) {
       throw new Error('Invalid date of birth format. Please use YYYY-MM-DD.');
@@ -29,7 +29,7 @@ class PatientAuthService {
     console.log("useruser", user)
     let savedUser = null;
     try{
-      savedUser = await this.patientRepository.save(user);
+      savedUser = await this.therapistRepository.save(user);
     } catch (e)
     {
       console.log(e)
@@ -40,14 +40,14 @@ class PatientAuthService {
   }
 
   async sendVerificationEmail({ email }) {
-    const user = await this.patientRepository.findByEmail(email);
+    const user = await this.therapistRepository.findByEmail(email);
     if (!user) {
       throw new Error('User does not exist');
     }
 
     const verificationToken = Math.floor(10000 + Math.random() * 90000);
     user.verificationToken = verificationToken;
-    await this.patientRepository.update(user);
+    await this.therapistRepository.update(user);
 
     await emailService.sendVerificationEmail(user, verificationToken);
     return { message: 'Verification email sent successfully.' };
@@ -55,7 +55,7 @@ class PatientAuthService {
 
   async verifyEmail(email, code) {
     try {
-      const user = await this.patientRepository.findByEmail(email);
+      const user = await this.therapistRepository.findByEmail(email);
       if (!user) {
         throw new Error('User not found');
       }
@@ -69,7 +69,7 @@ class PatientAuthService {
 
       user.isVerified = true;
       user.verificationToken = null;
-      await this.patientRepository.update(user);
+      await this.therapistRepository.update(user);
       return { message: 'Email verified successfully!' };
     } catch (err) {
       throw new Error(err.message || 'Verification failed');
@@ -77,7 +77,7 @@ class PatientAuthService {
   }
 
   async signIn({ email, password }) {
-    const user = await this.patientRepository.findByEmail(email);
+    const user = await this.therapistRepository.findByEmail(email);
     if (!user) {
       throw new Error('Invalid credentials');
     }
@@ -85,10 +85,6 @@ class PatientAuthService {
     if (user.isDeleted) {
       throw new Error('Account marked as Deleted.');
     }
-
-    // if (!user.isVerified) {
-    //   throw new Error('Please verify your email first');
-    // }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -112,7 +108,7 @@ class PatientAuthService {
   }
 
   async changePassword(userId, currentPassword, newPassword) {
-    const user = await this.patientRepository.findById(userId);
+    const user = await this.therapistRepository.findById(userId);
     if (!user) {
       throw new Error('Patient not found');
     }
@@ -124,32 +120,32 @@ class PatientAuthService {
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     user.password = hashedPassword;
-    await this.patientRepository.update(user);
+    await this.therapistRepository.update(user);
   }
 
   async resetPassword(email) {
-    const user = await this.patientRepository.findByEmail(email);
+    const user = await this.therapistRepository.findByEmail(email);
     if (!user) {
       throw new Error('Patient not found');
     }
     const temPass = "tempPassword@123";
     const hashedPassword = await bcrypt.hash(temPass, await bcrypt.genSalt(10));
     user.password = hashedPassword;
-    let savedUser = await this.patientRepository.update(user);
+    let savedUser = await this.therapistRepository.update(user);
     await emailService.sendPasswordResetEmail(savedUser, temPass);
   }
 
 
   async markAccountAsDeleted(userId) {
-    const user = await this.patientRepository.findById(userId);
+    const user = await this.therapistRepository.findById(userId);
     if (!user) {
       throw new Error('Patient not found');
     }
     user.isDeleted = true;
-    await this.patientRepository.update(user);
+    await this.therapistRepository.update(user);
   }
 
 
 }
 
-export default PatientAuthService;
+export default TherapistAuthService;

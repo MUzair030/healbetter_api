@@ -14,6 +14,10 @@ class PatientRepositoryImpl extends PatientRepository {
     return Patient.findOne({ googleId });
   }
 
+  async findAll() {
+    return Patient.find();
+  }
+
   async save(user) {
     const newUser = new Patient(user);
     return newUser.save();
