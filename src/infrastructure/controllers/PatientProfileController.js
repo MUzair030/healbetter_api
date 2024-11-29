@@ -64,8 +64,8 @@ router.post('/:id/profile-picture', upload.single('file'), async (req, res) => {
   }
 });
 
-router.get('/verify-email', async (req, res) => {
-  const { email, code } = req.query;
+router.post('/verify-email', async (req, res) => {
+  const { email, code } = req.body;
   try {
     if (!email || !code) {
       return CommonResponse.error(res, 'Email and verification code are required', 400);

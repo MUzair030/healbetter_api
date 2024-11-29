@@ -135,7 +135,7 @@ class TherapistAuthService {
     user.resetOtpExpiry = otpExpiry;
     await this.therapistRepository.update(user);
 
-    await emailService.sendForgotPasswordEmail({email, otp});
+    await emailService.sendForgotPasswordEmail(email, otp);
   }
 
   async verifyOtp(email, otp) {

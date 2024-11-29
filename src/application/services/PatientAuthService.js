@@ -139,7 +139,7 @@ class PatientAuthService {
     user.resetOtpExpiry = otpExpiry;
     await this.patientRepository.update(user);
 
-    await emailService.sendForgotPasswordEmail({email, otp});
+    await emailService.sendForgotPasswordEmail(email, otp);
   }
 
   async verifyOtp(email, otp) {

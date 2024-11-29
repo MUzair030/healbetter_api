@@ -24,7 +24,7 @@ class EmailService {
         }
       });
 
-      
+
     const verificationUrl = `${config.baseUrl}/api/auth/verify-email?token=${token}`;
     const mailOptions = {
       from: config.smtpUser,
@@ -50,7 +50,7 @@ class EmailService {
         }
       });
 
-    
+
     const mailOptions = {
       from: config.smtpUser,
       to: user.email,
@@ -66,7 +66,7 @@ class EmailService {
       }
   }
 
-  async sendForgotPasswordEmail(user, otp) {
+  async sendForgotPasswordEmail(email, otp) {
     this.transporter.verify(function (error, success) {
       if (error) {
         console.log(error);
@@ -78,7 +78,7 @@ class EmailService {
 
     const mailOptions = {
       from: config.smtpUser,
-      to: user.email,
+      to: email,
       subject: 'Your Password Reset OTP',
       text: `Please use the following OTP: ${otp}`,
     };
