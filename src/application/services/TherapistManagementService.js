@@ -1,5 +1,6 @@
-import bcrypt from 'bcryptjs';
+import {v4 as uuidv4} from 'uuid';
 import TherapistRepositoryImpl from "../../infrastructure/repositories/TherapistRepositoryImpl.js";
+import FileUploadService from "./FileUploadService.js";
 
 class TherapistManagementService {
   constructor() {
@@ -36,6 +37,31 @@ class TherapistManagementService {
       throw new Error('Therapist not found');
     }
     return user;
+  }
+
+  async updateTherapistById(id, updateData) {
+    if (!id) {
+      throw new Error('Therapist ID is required');
+    }
+    if (!updateData || Object.keys(updateData).length === 0) {
+      throw new Error('Update data is required');
+    }
+
+    const updatedPatient = await this.therapistRepository.findByIdAndUpdate(id, updateData);
+    if (!updatedPatient) {
+      throw new Error('Therapist not found');
+    }
+    return updatedPatient;
+  }
+
+  async uploadTherapistProfilePicture(file, user) {
+    console.log("uploadTherapistProfilePicture:::::::: ", user);
+    const uniqueFileName = `therapist/${uuidv4()}_${file.originalname}`;
+    const uploadResult = await FileUploadService.uploadToS3(file.buffer, uniqueFileName, file.mimetype);
+    console.log("uploadResult:::::::: ", uploadResult);
+    await this.updateTherapistById(user.id, {profilePicture: uploadResult?.Location});
+    return uploadResult;
+
   }
 }
 

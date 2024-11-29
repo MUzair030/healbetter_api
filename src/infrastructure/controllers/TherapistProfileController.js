@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import passport from '../../application/services/GoogleAuthService.js';
 import CommonResponse from '../../application/common/CommonResponse.js';
 import TherapistRepositoryImpl from "../repositories/TherapistRepositoryImpl.js";
@@ -10,6 +11,7 @@ const userRepository = new TherapistRepositoryImpl();
 const authService = new TherapistAuthService(userRepository);
 const therapistService = new TherapistManagementService();
 
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/', async (req, res) => {
   try {
@@ -27,6 +29,37 @@ router.get('/:id', async (req, res) => {
     CommonResponse.success(res, result);
   } catch (error) {
     CommonResponse.error(res, error.message, 404);
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  try {
+    const updatedPatient = await therapistService.updateTherapistById(id, updateData);
+    CommonResponse.success(res, updatedPatient);
+  } catch (error) {
+    CommonResponse.error(res, error.message, 404);
+
+  }
+});
+
+router.post('/:id/profile-picture', upload.single('file'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const file = req.file;
+
+    if (!file) {
+      return CommonResponse.error(res, 'No file uploaded', 400);
+    }
+    const user = await therapistService.getTherapistById(id);
+    if(user){
+      const uploadResult = await therapistService.uploadTherapistProfilePicture(file, user);
+      CommonResponse.success(res, uploadResult);
+    }
+  } catch (error) {
+    CommonResponse.error(res, error.message, 500);
   }
 });
 
@@ -58,14 +91,33 @@ router.put('/change-password', passport.authenticate('jwt', { session: false }),
   }
 });
 
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    await authService.sendForgotPasswordOTP(email);
+    CommonResponse.success(res, null, 'OTP sent successfully');
+  } catch (error) {
+    CommonResponse.error(res, error.message, 400);
+  }
+});
+
+router.post('/verify-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    await authService.verifyOtp(email, otp);
+    CommonResponse.success(res, null, 'OTP verified successfully');
+  } catch (error) {
+    CommonResponse.error(res, error.message, 400);
+  }
+});
 
 router.post('/reset-password', async (req, res) => {
   try {
-    await authService.resetPassword(req.body.email);
+    const { email, newPassword } = req.body;
+    const result = await authService.resetPasswordWithOtp(email, newPassword);
     CommonResponse.success(res, true);
-    // res.status(200).json(true);
   } catch (error) {
-    CommonResponse.error(res, err.message, 400);
+    CommonResponse.error(res, error.message, 400);
   }
 });
 
@@ -75,7 +127,7 @@ router.get('/delete', passport.authenticate('jwt', { session: false }), async (r
     await authService.markAccountAsDeleted(userId);
     CommonResponse.success(res, null,  'Account deleted successfully');
   } catch (error) {
-    CommonResponse.error(res, err.message, 400);
+    CommonResponse.error(res, error.message, 400);
   }
 });
 

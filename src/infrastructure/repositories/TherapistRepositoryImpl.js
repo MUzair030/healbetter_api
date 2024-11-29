@@ -25,8 +25,16 @@ class TherapistRepositoryImpl extends TherapistRepository {
 
   async update(user) {
     try {
-      const updatedUser = await Therapist.findByIdAndUpdate(user._id, user, { new: true });
+      const updatedUser = await Therapist.findByIdAndUpdate(user._id, user, { new: true, runValidators: true });
       return updatedUser;
+    } catch (error) {
+      throw new Error(`Failed to update user: ${error.message}`);
+    }
+  }
+
+  async findByIdAndUpdate(id, updatedData) {
+    try {
+      return await Therapist.findByIdAndUpdate(id, {$set: updatedData}, {new: true, runValidators: true});
     } catch (error) {
       throw new Error(`Failed to update user: ${error.message}`);
     }

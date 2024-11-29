@@ -25,8 +25,16 @@ class PatientRepositoryImpl extends PatientRepository {
 
   async update(user) {
     try {
-      const updatedUser = await Patient.findByIdAndUpdate(user._id, user, { new: true });
+      const updatedUser = await Patient.findByIdAndUpdate(user._id, user, { new: true, runValidators: true });
       return updatedUser;
+    } catch (error) {
+      throw new Error(`Failed to update user: ${error.message}`);
+    }
+  }
+
+  async findByIdAndUpdate(id, updatedData) {
+    try {
+      return await Patient.findByIdAndUpdate(id, {$set: updatedData}, {new: true, runValidators: true});
     } catch (error) {
       throw new Error(`Failed to update user: ${error.message}`);
     }

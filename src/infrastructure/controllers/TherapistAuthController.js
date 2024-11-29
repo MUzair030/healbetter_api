@@ -22,7 +22,7 @@ router.post('/resend-verification-email', async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
-      return CommonResponse.error(res, { message: 'Email is required' }, 400);
+      return CommonResponse.error(res, 'Email is required', 400);
     }
 
     const response = await authService.sendVerificationEmail({ email });

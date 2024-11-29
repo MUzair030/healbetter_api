@@ -24,7 +24,7 @@ class TherapistAuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // const verificationToken = jwt.sign({ email }, config.jwtSecret, { expiresIn: '1h' });
-    const verificationToken = Math.floor(10000 + Math.random() * 90000);
+    const verificationToken = Math.floor(10000 + Math.random() * 90000).toString();
     const user = { firstName, lastName, phone, email, password: hashedPassword, verificationToken, dob: formattedDob, city, state, country };
     console.log("useruser", user)
     let savedUser = null;
@@ -45,7 +45,7 @@ class TherapistAuthService {
       throw new Error('User does not exist');
     }
 
-    const verificationToken = Math.floor(10000 + Math.random() * 90000);
+    const verificationToken = Math.floor(10000 + Math.random() * 90000).toString();
     user.verificationToken = verificationToken;
     await this.therapistRepository.update(user);
 
@@ -63,7 +63,7 @@ class TherapistAuthService {
         throw new Error('User is already verified');
       }
 
-      if (user.verificationToken !== parseInt(code, 10)) {
+      if (user.verificationToken !== code) {
         throw new Error('Invalid verification code');
       }
 
@@ -123,18 +123,49 @@ class TherapistAuthService {
     await this.therapistRepository.update(user);
   }
 
-  async resetPassword(email) {
+  async sendForgotPasswordOTP(email) {
     const user = await this.therapistRepository.findByEmail(email);
     if (!user) {
-      throw new Error('Patient not found');
+      throw new Error('Therapist not found');
     }
-    const temPass = "tempPassword@123";
-    const hashedPassword = await bcrypt.hash(temPass, await bcrypt.genSalt(10));
-    user.password = hashedPassword;
-    let savedUser = await this.therapistRepository.update(user);
-    await emailService.sendPasswordResetEmail(savedUser, temPass);
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+    user.verificationToken = otp;
+    user.resetOtpExpiry = otpExpiry;
+    await this.therapistRepository.update(user);
+
+    await emailService.sendForgotPasswordEmail({email, otp});
   }
 
+  async verifyOtp(email, otp) {
+    const user = await this.therapistRepository.findByEmail(email);
+    if (!user) {
+      throw new Error('Therapist not found');
+    }
+
+    if (user.verificationToken !== otp || user.resetOtpExpiry < new Date()) {
+      throw new Error('Invalid or expired OTP');
+    }
+    return true;
+  }
+
+  async resetPasswordWithOtp(email, newPassword) {
+    const user = await this.therapistRepository.findByEmail(email);
+    if (!user) {
+      throw new Error('Therapist not found');
+    }
+    if (!user.verificationToken || user.resetOtpExpiry < new Date()) {
+      throw new Error('OTP verification required');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, await bcrypt.genSalt(10));
+    user.password = hashedPassword;
+    user.verificationToken = null;
+    user.resetOtpExpiry = null;
+    await this.therapistRepository.update(user);
+    return { message: 'Password reset successful' };
+  }
 
   async markAccountAsDeleted(userId) {
     const user = await this.therapistRepository.findById(userId);

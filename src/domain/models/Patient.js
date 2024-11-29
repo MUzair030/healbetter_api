@@ -14,6 +14,7 @@ const PatientSchema = new mongoose.Schema({
   profilePicture: { type: String, required: false },
   isVerified: { type: Boolean, default: false },
   verificationToken: String,
+  resetOtpExpiry: { type: Date, default: null },
   isDeleted: { type: Boolean, default: false },
 });
 
