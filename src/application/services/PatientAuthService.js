@@ -24,7 +24,7 @@ class PatientAuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // const verificationToken = jwt.sign({ email }, config.jwtSecret, { expiresIn: '1h' });
-    const verificationToken = Math.floor(10000 + Math.random() * 90000).toString();
+    const verificationToken = Math.floor(100000 + Math.random() * 90000).toString();
     const user = { firstName, lastName, phone, email, password: hashedPassword, verificationToken, dob: formattedDob, city, state, country };
     console.log("useruser", user)
     let savedUser = null;
@@ -45,7 +45,7 @@ class PatientAuthService {
       throw new Error('User does not exist');
     }
 
-    const verificationToken = Math.floor(10000 + Math.random() * 90000).toString();
+    const verificationToken = Math.floor(100000 + Math.random() * 90000).toString();
     user.verificationToken = verificationToken;
     await this.patientRepository.update(user);
 

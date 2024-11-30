@@ -9,6 +9,7 @@ import patientAuthController from './infrastructure/controllers/PatientAuthContr
 import therapistAuthController from './infrastructure/controllers/TherapistAuthController.js';
 import patientProfileController from './infrastructure/controllers/PatientProfileController.js';
 import therapistProfileController from './infrastructure/controllers/TherapistProfileController.js';
+import commonController from './infrastructure/controllers/CommonController.js';
 
 const app = express();
 const corsOptions = {
@@ -38,6 +39,7 @@ app.use('/api/v1/auth/patient', patientAuthController);
 app.use('/api/v1/auth/therapist', therapistAuthController);
 app.use('/api/v1/patients', patientProfileController);
 app.use('/api/v1/therapists', therapistProfileController);
+app.use('/api/v1', commonController);
 
 app.use((err, req, res, next) => {
   console.error(err);

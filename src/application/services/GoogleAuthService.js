@@ -3,8 +3,10 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import PatientRepositoryImpl from '../../infrastructure/repositories/PatientRepositoryImpl.js';
 import config from '../../config/config.js';
+import TherapistRepositoryImpl from "../../infrastructure/repositories/TherapistRepositoryImpl.js";
 
-const userRepository = new PatientRepositoryImpl();
+const patientRepository = new PatientRepositoryImpl();
+const therapistRepository = new TherapistRepositoryImpl();
 
 // Google OAuth Strategy
 passport.use(new GoogleStrategy({
@@ -15,9 +17,9 @@ passport.use(new GoogleStrategy({
 async (accessToken, refreshToken, profile, done) => {
   try {
     // Find or create user
-    let user = await userRepository.findByGoogleId(profile.id);
+    let user = await patientRepository.findByGoogleId(profile.id);
     if (!user) {
-      user = await userRepository.save({
+      user = await patientRepository.save({
         googleId: profile.id,
         name: profile.displayName,
         email: profile.emails[0].value,
@@ -37,7 +39,11 @@ passport.use(new JwtStrategy({
 },
 async (jwtPayload, done) => {
   try {
-    const user = await userRepository.findById(jwtPayload.userId);
+    let user = null;
+    user = await patientRepository.findById(jwtPayload.userId);
+    if(!user) {
+      user = await therapistRepository.findById(jwtPayload.userId);
+    }
     if (user) {
       return done(null, user);
     } else {
@@ -54,7 +60,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await userRepository.findById(id);
+    const user = await patientRepository.findById(id);
     done(null, user);
   } catch (err) {
     done(err, null);
