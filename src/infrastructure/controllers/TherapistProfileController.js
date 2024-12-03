@@ -22,6 +22,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.post('/search', async (req, res) => {
+  try {
+    const {
+      search, country, services, availabilityStartDate,
+      availabilityEndDate, typeOfAvailability, isVerified, specialization, page = 1, limit = 10
+    } = req.body;
+
+    const { therapists, totalTherapists } = await therapistService.searchTherapists(
+        { search, country, services, availabilityStartDate, availabilityEndDate, typeOfAvailability, isVerified, specialization },
+        { page, limit }
+    );
+
+    CommonResponse.success(res, {
+      data: therapists,
+      total: totalTherapists,
+      totalPages: Math.ceil(totalTherapists / limit),
+      currentPage: parseInt(page)
+    });
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -44,6 +68,122 @@ router.put('/:id', async (req, res) => {
 
   }
 });
+
+router.post('/:id/education', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { degree, institution, year } = req.body;
+
+    const therapist = await therapistService.addEducation(id, { degree, institution, year });
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+router.put('/:id/education/:educationId', async (req, res) => {
+  try {
+    const { id, educationId } = req.params;
+    const { degree, institution, year } = req.body;
+
+    const therapist = await therapistService.updateEducation(id, educationId, { degree, institution, year });
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+router.delete('/:id/education/:educationId', async (req, res) => {
+  try {
+    const { id, educationId } = req.params;
+
+    const therapist = await therapistService.deleteEducation(id, educationId);
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+router.post('/:id/certification', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, issuingOrganization, year } = req.body;
+
+    const therapist = await therapistService.addCertification(id, { title, issuingOrganization, year });
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+router.put('/:id/certification/:certificationId', async (req, res) => {
+  try {
+    const { id, certificationId } = req.params;
+    const { title, issuingOrganization, year } = req.body;
+
+    const therapist = await therapistService.updateCertification(id, certificationId, { title, issuingOrganization, year });
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+router.delete('/:id/certification/:certificationId', async (req, res) => {
+  try {
+    const { id, certificationId } = req.params;
+
+    const therapist = await therapistService.deleteCertification(id, certificationId);
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+router.post('/:id/availability', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { timestamp, probono } = req.body;
+
+    const therapist = await therapistService.addAvailability(id, { timestamp, probono });
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+router.put('/:id/availability/:availabilityId', async (req, res) => {
+  try {
+    const { id, availabilityId } = req.params;
+    const { timestamp, probono } = req.body;
+
+    const therapist = await therapistService.updateAvailability(id, availabilityId, { timestamp, probono });
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+router.delete('/:id/availability/:availabilityId', async (req, res) => {
+  try {
+    const { id, availabilityId } = req.params;
+
+    const therapist = await therapistService.deleteAvailability(id, availabilityId);
+    CommonResponse.success(res, therapist);
+  } catch (err) {
+    console.error(err);
+    CommonResponse.error(res, 'Server error', 500);
+  }
+});
+
+
 
 router.post('/:id/profile-picture', upload.single('file'), async (req, res) => {
   try {

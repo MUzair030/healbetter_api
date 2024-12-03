@@ -39,6 +39,21 @@ class TherapistRepositoryImpl extends TherapistRepository {
       throw new Error(`Failed to update user: ${error.message}`);
     }
   }
+
+  async searchTherapists(query, skip = 0, limit = 10){
+    try {
+      if (skip || limit) {
+        return await Therapist.find(query)
+            .skip(skip)
+            .limit(limit);
+      } else {
+        return await Therapist.countDocuments(query);
+      }
+    } catch (err) {
+      console.error(err);
+      throw new Error('Error while fetching therapists from the database');
+    }
+  };
 }
 
 export default TherapistRepositoryImpl;

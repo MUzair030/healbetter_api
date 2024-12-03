@@ -12,6 +12,10 @@ const PatientSchema = new mongoose.Schema({
   country: { type: String, required: false },
   password: { type: String, required: true },
   profilePicture: { type: String, required: false },
+  careRequired: { type: [String], required: false },
+  appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Appointment' }],
+
+
   isVerified: { type: Boolean, default: false },
   verificationToken: String,
   resetOtpExpiry: { type: Date, default: null },

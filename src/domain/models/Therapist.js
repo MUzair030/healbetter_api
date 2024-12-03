@@ -12,6 +12,33 @@ const TherapistSchema = new mongoose.Schema({
   country: { type: String, required: false },
   password: { type: String, required: true },
   profilePicture: { type: String, required: false },
+  education: [
+    {
+      degree: { type: String, required: true },
+      institution: { type: String, required: true },
+      year: { type: Number, required: true }
+    }
+  ],
+  certification: [
+    {
+      title: { type: String, required: true },
+      issuingOrganization: { type: String, required: true },
+      year: { type: Number, required: true }
+    }
+  ],
+  specialization: { type: [String], required: false }, // 'Mental Health', 'Physical Therapy'
+  title: { type: String, required: false },  // Professional title (e.g., Dr., Prof.)
+  careOffered: { type: [String], required: false }, //'Mental Health', 'Physical Therapy'
+  services: { type: [String], required: false }, //'Counseling', 'Consultation'
+  availability: [
+    {
+      timestamp: { type: Date, required: true },
+      probono: { type: Boolean, required: true, default: false }
+    }
+  ],
+  appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Appointment' }],
+
+
   isVerified: { type: Boolean, default: false },
   verificationToken: String,
   isDeleted: { type: Boolean, default: false },
