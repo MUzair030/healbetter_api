@@ -1,5 +1,3 @@
-import Patient from "../../../domain/models/Patient.js";
-
 export function mapToDomain(data) {
     const domain = {};
 
@@ -12,8 +10,9 @@ export function mapToDomain(data) {
     if (data.city) domain.city = data.city;
     if (data.state) domain.state = data.state;
     if (data.country) domain.country = data.country;
-    if (data.password) domain.password = data.password; // Ensure password is hashed before saving
+    if (data.password) domain.password = data.password;
     if (data.profilePicture) domain.profilePicture = data.profilePicture;
+    if (data.careRequired) domain.careRequired = data.careRequired;
     if (data.isVerified !== undefined) domain.isVerified = Boolean(data.isVerified);
     if (data.verificationToken) domain.verificationToken = data.verificationToken;
     if (data.resetOtpExpiry) domain.resetOtpExpiry = new Date(data.resetOtpExpiry);
@@ -39,6 +38,7 @@ export function mapToDto(data) {
     if (data.state) dto.state = data.state;
     if (data.country) dto.country = data.country;
     if (data.profilePicture) dto.profilePicture = data.profilePicture;
+    if (data.careRequired) dto.careRequired = data.careRequired;
     if (data.isVerified !== undefined) dto.isVerified = Boolean(data.isVerified);
     if (data.isDeleted !== undefined) dto.isDeleted = Boolean(data.isDeleted);
     dto.userType = "patient";

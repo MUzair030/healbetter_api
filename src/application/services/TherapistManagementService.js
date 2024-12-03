@@ -1,6 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
 import TherapistRepositoryImpl from "../../infrastructure/repositories/TherapistRepositoryImpl.js";
 import FileUploadService from "./FileUploadService.js";
+import {mapToDto as mapTherapistToDto} from "../common/mapper/TherapistMapper.js";
 
 class TherapistManagementService {
   constructor() {
@@ -12,7 +13,7 @@ class TherapistManagementService {
     if (!users || users.length === 0) {
       throw new Error('Therapist not found');
     }
-    return users;
+    return users?.map(user => mapTherapistToDto(user));
   }
 
   async searchTherapists(filters, pagination){
@@ -77,7 +78,7 @@ class TherapistManagementService {
         // Get total count of therapists matching the query for pagination
         const totalTherapists = await this.therapistRepository.searchTherapists(query);
 
-        return { therapists, totalTherapists };
+        return { therapists: therapists?.map(user => mapTherapistToDto(user)), totalTherapists };
       } catch (err) {
         console.error(err);
         throw new Error('Error while searching therapists');
@@ -93,7 +94,7 @@ class TherapistManagementService {
     if (!user) {
       throw new Error('Therapist not found');
     }
-    return user;
+    return mapTherapistToDto(user);
   }
 
   async getTherapistByEmail(email) {
@@ -105,7 +106,7 @@ class TherapistManagementService {
     if (!user) {
       throw new Error('Therapist not found');
     }
-    return user;
+    return mapTherapistToDto(user);
   }
 
   async updateTherapistById(id, updateData) {
@@ -120,7 +121,7 @@ class TherapistManagementService {
     if (!updatedPatient) {
       throw new Error('Therapist not found');
     }
-    return updatedPatient;
+    return mapTherapistToDto(updatedPatient);
   }
 
   async addEducation(therapistId, educationData) {
@@ -134,7 +135,7 @@ class TherapistManagementService {
       }
       therapist?.education.push(educationData);
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error adding education: ${err.message}`);
     }
@@ -158,7 +159,7 @@ class TherapistManagementService {
       }
       therapist.education[educationIndex] = { ...therapist.education[educationIndex], ...educationData };
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error updating education: ${err.message}`);
     }
@@ -175,7 +176,7 @@ class TherapistManagementService {
       }
       therapist.education = therapist.education.filter(e => e._id.toString() !== educationId);
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error deleting education: ${err.message}`);
     }
@@ -192,7 +193,7 @@ class TherapistManagementService {
       }
       therapist?.certification.push(certificationData);
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error adding certification: ${err.message}`);
     }
@@ -216,7 +217,7 @@ class TherapistManagementService {
       }
       therapist.certification[certificationIndex] = { ...therapist.certification[certificationIndex], ...certificationData };
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error updating certification: ${err.message}`);
     }
@@ -233,7 +234,7 @@ class TherapistManagementService {
       }
       therapist.certification = therapist.certification.filter(c => c._id.toString() !== certificationId);
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error deleting certification: ${err.message}`);
     }
@@ -250,9 +251,34 @@ class TherapistManagementService {
       }
       therapist?.availability.push(availabilityData);
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error adding availability: ${err.message}`);
+    }
+  }
+
+  async addMultipleAvailabilities(therapistId, availabilities) {
+    if (!Array.isArray(availabilities) || availabilities.length === 0) {
+      throw new Error('Availabilities must be a non-empty array');
+    }
+
+    try {
+      const therapist = await this.therapistRepository.findById(therapistId);
+      if (!therapist) {
+        throw new Error('Therapist not found');
+      }
+
+      availabilities.forEach(availability => {
+        if (!availability.timestamp || typeof availability.probono !== 'boolean') {
+          throw new Error('Each availability must have a timestamp and a probono field');
+        }
+        therapist?.availability.push(availability);
+      });
+
+      await this.therapistRepository.save(therapist);
+      return mapTherapistToDto(therapist);
+    } catch (err) {
+      throw new Error(`Error adding availabilities: ${err.message}`);
     }
   }
 
@@ -274,7 +300,7 @@ class TherapistManagementService {
       }
       therapist.availability[availabilityIndex] = { ...therapist.availability[availabilityIndex], ...availabilityData };
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error updating availability: ${err.message}`);
     }
@@ -291,7 +317,7 @@ class TherapistManagementService {
       }
       therapist.availability = therapist.availability.filter(a => a._id.toString() !== availabilityId);
       await this.therapistRepository.save(therapist);
-      return therapist;
+      return mapTherapistToDto(therapist);
     } catch (err) {
       throw new Error(`Error deleting availability: ${err.message}`);
     }

@@ -5,7 +5,17 @@ import CommonResponse from "../../application/common/CommonResponse.js";
 const router = express.Router();
 const appointmentService = new AppointmentService();
 
-router.post('/create', async (req, res) => {
+router.get('/', async (req, res) => {
+  try {
+    const appointments = await appointmentService.getAllAppointments();
+    CommonResponse.success(res, appointments, 'Appointments fetched successfully');
+  } catch (error) {
+    console.error(error);
+    CommonResponse.error(res, error.message, 400);
+  }
+});
+
+router.post('/', async (req, res) => {
   try {
     const appointmentData = req.body;
     const createdAppointment = await appointmentService.createAppointment(appointmentData);
@@ -35,16 +45,6 @@ router.delete('/:appointmentId', async (req, res) => {
 
     const deletedAppointment = await appointmentService.deleteAppointment(appointmentId);
     CommonResponse.success(res, deletedAppointment, 'Appointment deleted successfully');
-  } catch (error) {
-    console.error(error);
-    CommonResponse.error(res, error.message, 400);
-  }
-});
-
-router.get('/', async (req, res) => {
-  try {
-    const appointments = await appointmentService.getAllAppointments();
-    CommonResponse.success(res, appointments, 'Appointments fetched successfully');
   } catch (error) {
     console.error(error);
     CommonResponse.error(res, error.message, 400);

@@ -12,6 +12,7 @@ const TherapistSchema = new mongoose.Schema({
   country: { type: String, required: false },
   password: { type: String, required: true },
   profilePicture: { type: String, required: false },
+  about: { type: String, required: false },
   education: [
     {
       degree: { type: String, required: true },

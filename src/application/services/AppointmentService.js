@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import AppointmentRepositoryImpl from "../../infrastructure/repositories/AppointmentRepositoryImpl.js";
 
 
@@ -14,6 +15,13 @@ class AppointmentService {
     const { patient, therapist, mode, type, date, time } = appointmentData;
     if (!patient || !therapist || !mode || !type || !date || !time) {
       throw new Error('Missing required fields');
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(patient)) {
+      throw new Error('Invalid Patient ID');
+    }
+    if (!mongoose.Types.ObjectId.isValid(therapist)) {
+      throw new Error('Invalid Therapist ID');
     }
 
     try {

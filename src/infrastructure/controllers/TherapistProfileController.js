@@ -148,9 +148,12 @@ router.delete('/:id/certification/:certificationId', async (req, res) => {
 router.post('/:id/availability', async (req, res) => {
   try {
     const { id } = req.params;
-    const { timestamp, probono } = req.body;
 
-    const therapist = await therapistService.addAvailability(id, { timestamp, probono });
+    if (!Array.isArray(req.body) || req.body.length === 0) {
+      return CommonResponse.error(res, 'Availabilities must be a non-empty array', 400);
+    }
+
+    const therapist = await therapistService.addMultipleAvailabilities(id, req.body);
     CommonResponse.success(res, therapist);
   } catch (err) {
     console.error(err);
@@ -182,8 +185,6 @@ router.delete('/:id/availability/:availabilityId', async (req, res) => {
     CommonResponse.error(res, 'Server error', 500);
   }
 });
-
-
 
 router.post('/:id/profile-picture', upload.single('file'), async (req, res) => {
   try {

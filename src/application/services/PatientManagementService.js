@@ -1,6 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
 import PatientRepositoryImpl from "../../infrastructure/repositories/PatientRepositoryImpl.js";
 import FileUploadService from "./FileUploadService.js";
+import {mapToDto as mapPatientToDto} from "../common/mapper/PatientMapper.js";
 
 class PatientManagementService {
   constructor() {
@@ -12,7 +13,7 @@ class PatientManagementService {
     if (!users || users.length === 0) {
       throw new Error('Patients not found');
     }
-    return users;
+    return users?.map(user => mapPatientToDto(user));
   }
 
   async getPatientById(id) {
@@ -23,7 +24,7 @@ class PatientManagementService {
     if (!user) {
       throw new Error('Patient not found');
     }
-    return user;
+    return mapPatientToDto(user);
   }
 
   async getPatientByEmail(email) {
@@ -34,7 +35,7 @@ class PatientManagementService {
     if (!user) {
       throw new Error('Patient not found');
     }
-    return user;
+    return mapPatientToDto(user);
   }
 
   async updatePatientById(id, updateData) {
@@ -49,7 +50,7 @@ class PatientManagementService {
     if (!updatedPatient) {
       throw new Error('Patient not found');
     }
-    return updatedPatient;
+    return mapPatientToDto(updatedPatient);
   }
 
   async uploadPatientProfilePicture(file, user) {
