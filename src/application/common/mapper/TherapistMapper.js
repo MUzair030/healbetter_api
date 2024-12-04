@@ -17,6 +17,7 @@ export function mapToDomain(data) {
     if (data.careOffered) domain.careOffered = data.careOffered;
     if (data.services) domain.services = data.services;
     if (data.specialization) domain.specialization = data.specialization;
+    if (data.isPublic !== undefined) domain.isPublic = Boolean(data.isPublic);
     if (data.isVerified !== undefined) domain.isVerified = Boolean(data.isVerified);
     if (data.verificationToken) domain.verificationToken = data.verificationToken;
     if (data.resetOtpExpiry) domain.resetOtpExpiry = new Date(data.resetOtpExpiry);
@@ -50,6 +51,7 @@ export function mapToDto(data) {
     if (data.education) dto.education = data.education;
     if (data.certification) dto.certification = data.certification;
     if (data.availability) dto.availability = data.availability;
+    if (data.isPublic !== undefined) dto.isPublic = Boolean(data.isPublic);
     if (data.isVerified !== undefined) dto.isVerified = Boolean(data.isVerified);
     if (data.isDeleted !== undefined) dto.isDeleted = Boolean(data.isDeleted);
     dto.userType = "Therapist";

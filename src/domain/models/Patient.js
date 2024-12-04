@@ -16,6 +16,7 @@ const PatientSchema = new mongoose.Schema({
   appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Appointment' }],
 
 
+  isPublic: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
   verificationToken: String,
   resetOtpExpiry: { type: Date, default: null },

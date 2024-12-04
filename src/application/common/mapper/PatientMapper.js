@@ -13,6 +13,7 @@ export function mapToDomain(data) {
     if (data.password) domain.password = data.password;
     if (data.profilePicture) domain.profilePicture = data.profilePicture;
     if (data.careRequired) domain.careRequired = data.careRequired;
+    if (data.isPublic !== undefined) domain.isPublic = Boolean(data.isPublic);
     if (data.isVerified !== undefined) domain.isVerified = Boolean(data.isVerified);
     if (data.verificationToken) domain.verificationToken = data.verificationToken;
     if (data.resetOtpExpiry) domain.resetOtpExpiry = new Date(data.resetOtpExpiry);
@@ -39,6 +40,7 @@ export function mapToDto(data) {
         if (data.country) dto.country = data.country;
         if (data.profilePicture) dto.profilePicture = data.profilePicture;
         if (data.careRequired) dto.careRequired = data.careRequired;
+        if (data.isPublic !== undefined) dto.isPublic = Boolean(data.isPublic);
         if (data.isVerified !== undefined) dto.isVerified = Boolean(data.isVerified);
         if (data.isDeleted !== undefined) dto.isDeleted = Boolean(data.isDeleted);
         dto.userType = "Patient";
