@@ -26,22 +26,23 @@ export function mapToDomain(data) {
 
 export function mapToDto(data) {
     const dto = {};
-
-    if (data?._id) dto.id = data._id.toString();
-    if (data.googleId) dto.googleId = data.googleId;
-    if (data.firstName) dto.firstName = data.firstName;
-    if (data.lastName) dto.lastName = data.lastName;
-    if (data.email) dto.email = data.email;
-    if (data.phone) dto.phone = data.phone;
-    if (data.dob) dto.dob = new Date(data.dob);
-    if (data.city) dto.city = data.city;
-    if (data.state) dto.state = data.state;
-    if (data.country) dto.country = data.country;
-    if (data.profilePicture) dto.profilePicture = data.profilePicture;
-    if (data.careRequired) dto.careRequired = data.careRequired;
-    if (data.isVerified !== undefined) dto.isVerified = Boolean(data.isVerified);
-    if (data.isDeleted !== undefined) dto.isDeleted = Boolean(data.isDeleted);
-    dto.userType = "patient";
+    if(data){
+        if (data?._id) dto.id = data._id.toString();
+        if (data?.googleId) dto.googleId = data.googleId;
+        if (data.firstName) dto.firstName = data.firstName;
+        if (data.lastName) dto.lastName = data.lastName;
+        if (data.email) dto.email = data.email;
+        if (data.phone) dto.phone = data.phone;
+        if (data.dob) dto.dob = new Date(data.dob);
+        if (data.city) dto.city = data.city;
+        if (data.state) dto.state = data.state;
+        if (data.country) dto.country = data.country;
+        if (data.profilePicture) dto.profilePicture = data.profilePicture;
+        if (data.careRequired) dto.careRequired = data.careRequired;
+        if (data.isVerified !== undefined) dto.isVerified = Boolean(data.isVerified);
+        if (data.isDeleted !== undefined) dto.isDeleted = Boolean(data.isDeleted);
+        dto.userType = "Patient";
+    }
 
     return dto;
 }

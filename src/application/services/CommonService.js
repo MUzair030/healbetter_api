@@ -7,7 +7,7 @@ import therapist from "../../domain/models/Therapist.js";
 
 
 class CommonService {
-  constructor(therapistRepository) {
+  constructor() {
     this.patientRepository = new PatientRepositoryImpl();
     this.therapistRepository = new TherapistRepositoryImpl();
   }

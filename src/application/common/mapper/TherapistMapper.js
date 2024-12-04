@@ -52,7 +52,7 @@ export function mapToDto(data) {
     if (data.availability) dto.availability = data.availability;
     if (data.isVerified !== undefined) dto.isVerified = Boolean(data.isVerified);
     if (data.isDeleted !== undefined) dto.isDeleted = Boolean(data.isDeleted);
-    dto.userType = "therapist";
+    dto.userType = "Therapist";
 
     return dto;
 }
