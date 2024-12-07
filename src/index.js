@@ -14,6 +14,7 @@ import therapistProfileController from './infrastructure/controllers/TherapistPr
 import commonController from './infrastructure/controllers/CommonController.js';
 import appointmentController from './infrastructure/controllers/AppointmentController.js';
 import threadController from './infrastructure/controllers/ThreadController.js';
+import chatController, {handleSendMessage} from './infrastructure/controllers/ChatController.js';
 
 const app = express();
 
@@ -55,23 +56,26 @@ app.use('/api/v1/patients', patientProfileController);
 app.use('/api/v1/therapists', therapistProfileController);
 app.use('/api/v1/appointments', appointmentController);
 app.use('/api/v1/threads', threadController);
+app.use('/api/v1/chat', chatController);
 app.use('/api/v1', commonController);
 
 // socket io
 io.on('connection', (socket) => {
-    console.log('A user connected');
+    console.log('A user connected:', socket.id);
+    // socket.on('joinRoom', (chatId) => {
+    //     socket.join(chatId);
+    //     console.log(`User joined chat room: ${chatId}`);
+    // });
 
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
+    socket.on('sendMessage', (data) => {
+        handleSendMessage(socket, data, io);
     });
 
-    // // Example event to broadcast new comment creation
-    // socket.on('newComment', (data) => {
-    //     console.log('New comment received:', data);
-    //     // Broadcast the event to all connected clients
-    //     io.emit('newComment', data);
-    // });
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+    });
 });
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
