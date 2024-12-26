@@ -2,10 +2,11 @@ import express from 'express';
 import CommonResponse from '../../application/common/CommonResponse.js';
 import ChatService from '../../application/services/ChatService.js';
 import CommonService from "../../application/services/CommonService.js";
-import {io} from "../../index.js";
+// import {io} from "../../index.js";
 
 const router = express.Router();
 const commonService = new CommonService();
+export const userSocketMap = {};
 
 router.post('/initiate', async (req, res) => {
     const { userId1, userId2 } = req.body;
@@ -51,13 +52,27 @@ export async function handleSendMessage(socket, data, io) {
     try {
         const updatedChat = await ChatService.addMessage(chatId, senderId, senderModel, content);
         const newMessage = updatedChat.messages[updatedChat.messages.length - 1];
-
-        io.to(chatId).emit('newMessage', { chatId, ...newMessage });
-
+        // io.to(chatId).emit('newMessage', { chatId, ...newMessage });
         // io.to(chatId).emit('newMessage', updatedChat.messages[updatedChat.messages.length - 1]);
     } catch (err) {
         console.error('Error sending message:', err);
         socket.emit('errorMessage', 'Failed to send message');
+    }
+}
+
+// Helper function to get the socket IDs of participants in a chat
+export async function getReceiverSocketId(chatId) {
+    try {
+        const chat = await ChatService.getChatById(chatId);
+        if (chat) {
+            return chat.participants;
+        } else {
+            console.log(`Chat ${chatId} not found.`);
+            return null;
+        }
+    } catch (err) {
+        console.error('Error fetching chat participants:', err);
+        return null;
     }
 }
 
