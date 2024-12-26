@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import bodyParser from 'body-parser';
+// import http from 'http';
 import https from 'https';
 import fs from 'fs';
 import { Server as SocketIOServer } from 'socket.io';
@@ -23,23 +24,31 @@ import chatController, {
 
 const app = express();
 // Load SSL certificates
+// Enable for AWS
 const options = {
     key: fs.readFileSync('/home/ec2-user/certs/selfsigned.key'), // Update path if needed
     cert: fs.readFileSync('/home/ec2-user/certs/selfsigned.crt'),
   };
-
-const server = https.createServer(options, app);
-export const io = new SocketIOServer(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-    },
-});
+  
+  const server = https.createServer(options, app);
 
 
-// CORS configuration
+  // enable for local
+//   const server = http.createServer(app);
+
+  export const io = new SocketIOServer(server, {
+      cors: {
+          origin: "*",
+          methods: ["GET", "POST"],
+      },
+  });
+
+
+
+
+
 const corsOptions = {
-    origin: process.env.ALLOWED_ORIGIN || '*',
+    origin: process.env.ALLOWED_ORIGIN || '*',  // Allow specific origins if needed
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
 };
@@ -123,7 +132,6 @@ io.on('connection', (socket) => {
     });
 });
 
-
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err);
@@ -132,6 +140,7 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const PORT = 8443;
+// enable for aws
 server.listen(PORT, '0.0.0.0', (err) => {
     if (err) {
         console.error('Failed to start server:', err);
@@ -139,3 +148,8 @@ server.listen(PORT, '0.0.0.0', (err) => {
         console.log(`Server started on https://<your-public-ip>:${PORT}`);
     }
 });
+
+// enable for local
+// server.listen(PORT, () => {
+//     console.log(`Server started on port ${PORT}`);
+// });

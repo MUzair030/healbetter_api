@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import CommonResponse from '../../application/common/CommonResponse.js';
 import ThreadService from "../../application/services/ThreadService.js";
-import { io } from '../../index.js';
+// import { io } from '../../index.js';
 import CommonService from "../../application/services/CommonService.js";
 
 
@@ -77,7 +77,7 @@ router.post('/:threadId/comment', async (req, res) => {
             createdBy,
             creatorModel,
         });
-        io.emit('newComment', { threadId, comment: { content, createdBy, creatorModel } });
+        // io.emit('newComment', { threadId, comment: { content, createdBy, creatorModel } });
         CommonResponse.success(res, updatedThread);
     } catch (err) {
         CommonResponse.error(res, err.message, 400);
